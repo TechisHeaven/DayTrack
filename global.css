@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root {
+  --main-background-color: #2b2a2b;
+  --main-primary-color: #cfff46;
+  --main-secondary-color: #343434;
+  --main-white-color: #fefeff;
+  --main-black-color: #000101;
+}
+
+body {
+  background: linear-gradient(
+    -45deg,
+    var(--main-background-color),
+    var(--main-black-color)
+  );
+}
