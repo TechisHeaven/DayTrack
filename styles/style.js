@@ -5,14 +5,17 @@ export default StyleSheet.create({
     flex: 1,
     marginTop: 20,
   },
-  gradientBackground: {
-    backgroundColor: "linear-gradient(to right, #000, #fff)",
-  },
   heading: {
     color: "white",
-    fontSize: 50,
+    fontSize: 46,
     textAlign: "left",
     maxWidth: "80%",
     fontWeight: "800",
+  },
+  text: {
+    color: "white",
+    fontSize: 20,
+    textAlign: "left",
+    fontWeight: "600",
   },
 });

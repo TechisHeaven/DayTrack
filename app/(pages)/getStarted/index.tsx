@@ -2,7 +2,13 @@ import React from "react";
 import { SafeAreaView, Text, View } from "react-native";
 import style from "@/styles/style";
 import Button from "@/components/Button";
+import { router } from "expo-router";
+import { useAuthStore } from "@/store/authStore";
 export default function Getstarted() {
+  const { login } = useAuthStore();
+  function handleGetStarted() {
+    router.push("/(pages)/Login");
+  }
   return (
     <SafeAreaView
       style={{
@@ -10,9 +16,43 @@ export default function Getstarted() {
         paddingTop: 100,
         flex: 1,
         alignItems: "flex-start",
-        justifyContent: "start",
       }}
     >
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 10,
+          alignItems: "center",
+          marginBottom: 30,
+        }}
+      >
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              borderRadius: 100,
+              width: 20,
+              height: 20,
+              backgroundColor: "white",
+            }}
+          />
+          <View
+            style={{
+              borderRadius: 100,
+              width: 20,
+              height: 20,
+              backgroundColor: "#cfff46",
+            }}
+          />
+        </View>
+        <Text style={style.text}>DayTrack</Text>
+      </View>
       <Text style={style.heading}>
         You suck at taking notes brother, you need me :)
       </Text>
@@ -83,7 +123,7 @@ export default function Getstarted() {
       </View>
 
       <View style={{ position: "absolute", right: 20, bottom: 20 }}>
-        <Button onPress={() => null} icon={"chevron-right"} />
+        <Button onPress={handleGetStarted} icon={"chevron-right"} />
       </View>
     </SafeAreaView>
   );
