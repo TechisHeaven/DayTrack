@@ -1,19 +1,21 @@
 import React from "react";
-import { SafeAreaView, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import style from "@/styles/style";
 import Button from "@/components/Button";
 import { router } from "expo-router";
 import { useAuthStore } from "@/store/authStore";
+import { SafeAreaView } from "react-native-safe-area-context";
 export default function Getstarted() {
   const { login } = useAuthStore();
   function handleGetStarted() {
     router.push("/(pages)/Login");
   }
+
   return (
     <SafeAreaView
       style={{
         padding: 20,
-        paddingTop: 100,
+
         flex: 1,
         alignItems: "flex-start",
       }}

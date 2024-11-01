@@ -2,11 +2,14 @@ import React, { useState, useRef } from "react";
 import { Text, View, StyleSheet, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "@/components/Button"; // Assuming you have a Button component
-import { useGlobalSearchParams } from "expo-router";
+import { router, useGlobalSearchParams } from "expo-router";
+import { useAuthStore } from "@/store/authStore";
+import { setToken } from "@/utils/handleToken";
+import { sleep } from "@/utils/handleSleep";
 
 export default function OTPPage() {
   const { email } = useGlobalSearchParams();
-
+  const { login, setIsLoading } = useAuthStore();
   const [otp, setOtp] = useState<string[]>(Array(4).fill("")); // Adjust length as needed
   const inputRefs = useRef<(TextInput | null)[]>([]); // Store refs for TextInputs
 
@@ -31,8 +34,16 @@ export default function OTPPage() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setIsLoading(true);
     console.log("OTP entered:", otp.join(""));
+    console.log("Verified");
+    if (otp.length < 4) return;
+    const token = setToken();
+    await sleep(1000);
+    login();
+    setIsLoading(false);
+    router.push("/(main)/Home");
     //verify here the code for now we will navigate to screen
   };
 
@@ -58,7 +69,10 @@ export default function OTPPage() {
         })}
       </View>
       <Button
-        style={styles.button}
+        style={[
+          styles.button,
+          !otp.every((d) => d.length > 0) && styles.buttonDisabled,
+        ]}
         onPress={handleSubmit}
         disabled={!otp.every((d) => d.length > 0)}
       >
@@ -109,7 +123,7 @@ const styles = StyleSheet.create({
     width: "80%",
   },
   input: {
-    width: 40,
+    width: 50,
     height: 50,
     borderWidth: 1,
     borderColor: "#fff",
@@ -122,5 +136,8 @@ const styles = StyleSheet.create({
   button: {
     borderRadius: 10,
     width: "100%",
+  },
+  buttonDisabled: {
+    backgroundColor: "gray",
   },
 });
