@@ -1,14 +1,10 @@
 import {
   DarkTheme,
   DefaultTheme,
-  NavigationContainer,
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import {
-  createStackNavigator,
-  CardStyleInterpolators,
-} from "@react-navigation/stack";
+
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -16,7 +12,7 @@ import { useAuthStore } from "@/store/authStore";
 import "../global.css";
 import React from "react";
 import Header from "@/components/Header";
-import { Slot, Stack } from "expo-router";
+import { Stack } from "expo-router";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -39,19 +35,10 @@ export default function RootLayout() {
   if (!loaded) {
     return null;
   }
-
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      {isAuthenticated && <Header />}
-      {/* <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, // Right-swipe animation
-        }}
-      >
-        <Stack.Screen name="index" />
-        <Stack.Screen name="(pages)" />
-      </Stack.Navigator> */}
+      {isAuthenticated ? <Header /> : null}
+
       <Stack
         screenOptions={{
           headerShown: false,

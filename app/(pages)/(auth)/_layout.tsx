@@ -15,6 +15,7 @@ export default function Layout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Login/index" />
       <Stack.Screen name="getStarted/index" />
+      {/* <Stack.Screen name="OTP/[email]" /> */}
     </Stack>
   );
 }

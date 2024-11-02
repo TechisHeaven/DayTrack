@@ -47,9 +47,22 @@ export default function Home() {
 
   const columnCount = getColumnCount();
 
+  const filteredNotes = notes.filter((note) =>
+    selectedTab === "all"
+      ? true
+      : selectedTab
+      ? note.tags?.includes(selectedTab)
+      : note.tags?.length === 0
+  );
   // Render item function
   const renderItem = ({ item }: { item: NoteCardProps }) => (
     <TouchableOpacity
+      onPress={() =>
+        router.navigate({
+          pathname: "/(main)/Note/[id]",
+          params: { id: item.id },
+        })
+      }
       key={item.id}
       style={[styles.noteContainer, !isGrid && styles.noteContainerList]}
     >
@@ -69,9 +82,12 @@ export default function Home() {
         <Text style={[styles.heading, { fontFamily: "AntonRegular" }]}>
           Your Notes
         </Text>
-        <View style={styles.create}>
+        <TouchableOpacity
+          onPress={() => router.push("/Note")}
+          style={styles.create}
+        >
           <Icon name="plus" style={styles.icon} />
-        </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.layoutToggle}>
         <Button
@@ -111,7 +127,7 @@ export default function Home() {
         <TabList tabs={tabs} onTabSelect={handleTabSelect} />
       </View>
       <FlatList
-        data={notes}
+        data={filteredNotes}
         renderItem={renderItem}
         keyExtractor={(item) => item.id as string}
         showsVerticalScrollIndicator={false}

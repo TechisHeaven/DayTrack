@@ -15,7 +15,6 @@ export default function Getstarted() {
     <SafeAreaView
       style={{
         padding: 20,
-
         flex: 1,
         alignItems: "flex-start",
       }}

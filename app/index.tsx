@@ -27,6 +27,9 @@ export default function index() {
     if (appReady && !isAuthenticated) {
       router.push("/getStarted");
     }
+    if (appReady && isAuthenticated) {
+      router.push("/Home");
+    }
   }, [appReady, isAuthenticated]);
 
   // Show a splash screen while loading
@@ -34,9 +37,5 @@ export default function index() {
     return <SplashScreen />;
   }
 
-  return (
-    <SafeAreaView>
-      <Text style={{ color: "#fff" }}>Auth</Text>
-    </SafeAreaView>
-  );
+  return <SplashScreen />;
 }

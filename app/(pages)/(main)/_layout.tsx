@@ -1,7 +1,7 @@
 import { useAuthStore } from "@/store/authStore";
-import { useFonts } from "expo-font";
-import { router, SplashScreen, Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import React, { useEffect } from "react";
+import "../../../global.css";
 
 export default function Layout() {
   const { isAuthenticated } = useAuthStore();
@@ -15,6 +15,7 @@ export default function Layout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Home/index" />
       <Stack.Screen name="Explore/index" />
+      <Stack.Screen name="Note/[id]" />
     </Stack>
   );
 }
