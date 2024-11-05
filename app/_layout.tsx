@@ -11,8 +11,8 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { useAuthStore } from "@/store/authStore";
 import "../global.css";
 import React from "react";
-import Header from "@/components/Header";
 import { Stack } from "expo-router";
+import { account } from "@/service/config.service";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -24,7 +24,21 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     AntonRegular: require("../assets/fonts/Anton-Regular.ttf"),
   });
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, setUser, login } = useAuthStore();
+
+  useEffect(() => {
+    async function getSession() {
+      try {
+        const session = await account.getSession("current");
+        const user = await account.get();
+        setUser(user);
+        if (session) login();
+      } catch (error) {
+        console.log("Failed to get Session", error);
+      }
+    }
+    getSession();
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (loaded) {
@@ -35,21 +49,17 @@ export default function RootLayout() {
   if (!loaded) {
     return null;
   }
+
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      {isAuthenticated ? <Header /> : null}
-
       <Stack
         screenOptions={{
           headerShown: false,
           fullScreenGestureEnabled: true,
         }}
       >
-        {isAuthenticated ? (
-          <Stack.Screen name="(pages)/(auth)" />
-        ) : (
-          <Stack.Screen name="(pages)/(main)" />
-        )}
+        <Stack.Screen name="(pages)/(main)" />
+        <Stack.Screen name="(pages)/(auth)" />
       </Stack>
     </ThemeProvider>
   );

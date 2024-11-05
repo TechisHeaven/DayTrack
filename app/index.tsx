@@ -8,7 +8,13 @@ import SplashScreen from "@/components/SplashScreen";
 export default function index() {
   const { isAuthenticated } = useAuthStore();
   const [appReady, setAppReady] = useState(false);
+  const [isSplashScreen, setIsSplashScreen] = useState<boolean>(true);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setIsSplashScreen(false);
+    }, 5000);
+  }, []);
   // Load custom fonts
   const [fontsLoaded] = useFonts({
     // Add your custom fonts here
@@ -25,17 +31,14 @@ export default function index() {
   // Only navigate if the app is ready
   useEffect(() => {
     if (appReady && !isAuthenticated) {
-      router.push("/getStarted");
+      !isSplashScreen && router.replace("/getStarted");
     }
     if (appReady && isAuthenticated) {
-      router.push("/Home");
+      !isSplashScreen && router.replace("/Home");
     }
-  }, [appReady, isAuthenticated]);
+  }, [appReady, isAuthenticated, isSplashScreen]);
 
   // Show a splash screen while loading
-  if (!appReady) {
-    return <SplashScreen />;
-  }
 
   return <SplashScreen />;
 }

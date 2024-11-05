@@ -3,7 +3,7 @@ import NoteCard from "@/components/NoteCard";
 import TabList from "@/components/TabList";
 import { notes } from "@/constants/Notes";
 import { NoteCardProps } from "@/types/main.type";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity } from "react-native";
 import { Text, View } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
@@ -11,12 +11,34 @@ import IoniconsIcon from "react-native-vector-icons/Ionicons";
 import FontAwesomeIcon from "react-native-vector-icons/FontAwesome6";
 import { router } from "expo-router";
 import { FlatList } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import Header from "@/components/Header";
+import EmojiPicker from "@/components/Dialog";
+import { useAuthStore } from "@/store/authStore";
+import { account } from "@/service/config.service";
+import DialogModal from "@/components/Dialog";
+import NameUpdateForm from "@/components/UpdateName";
 
 export default function Home() {
   const [selectedTab, setSelectedTab] = useState<string | null>(null);
   const [isGrid, setIsGrid] = useState<boolean>(true);
+  const [isVisible, setIsVisible] = useState<boolean>(true);
   const [selectedLayout, setSelectedLayout] = useState<"grid" | "list">("grid");
+  const { user } = useAuthStore();
+  useEffect(() => {
+    if (!user.name) {
+      setIsVisible(true);
+    } else {
+      setIsVisible(false);
+    }
+  }, [user]);
 
+  function handleCloseModal() {
+    setIsVisible(false);
+  }
+  function handleUpateSession() {
+    setIsVisible(false);
+  }
   const tabs = [
     "all",
     "personal",
@@ -77,7 +99,8 @@ export default function Home() {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <Header />
       <View style={styles.header}>
         <Text style={[styles.heading, { fontFamily: "AntonRegular" }]}>
           Your Notes
@@ -135,16 +158,19 @@ export default function Home() {
         numColumns={columnCount}
         key={isGrid ? "grid" : "row"}
       />
-    </View>
+      <DialogModal isVisible={isVisible} onClose={handleCloseModal}>
+        <NameUpdateForm onUpdateSuccess={handleUpateSession} />
+      </DialogModal>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     display: "flex",
     gap: 10,
+    paddingHorizontal: 12,
   },
   noteCardContainer: {
     display: "flex",

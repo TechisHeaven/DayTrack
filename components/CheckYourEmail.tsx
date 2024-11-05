@@ -3,16 +3,18 @@ import { StyleSheet, Text, View } from "react-native";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import Button from "./Button";
 import { router } from "expo-router";
+import { account } from "@/service/config.service";
 
 interface CheckYourEmailProps {
   onClose: () => void;
   email: string;
+  userId: string;
 }
 export default function CheckYourEmail(props: CheckYourEmailProps) {
-  const { onClose, email } = props;
-  function handlePress() {
+  const { onClose, email, userId } = props;
+  async function handlePress() {
     onClose();
-    router.navigate(`/(pages)/OTP/${email.toString()}`);
+    router.navigate(`/(pages)/OTP/${email.toString()}/${userId.toString()}`);
   }
   return (
     <View style={styles.bottomSheetContent}>

@@ -1,34 +1,54 @@
-import React from "react";
+import { getUser } from "@/service/auth.service";
+import { router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { TouchableOpacity } from "react-native";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 
 export default function Header() {
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          style={styles.image}
-          source={require("../assets/images/avatar.jpeg")}
-        />
+  const [name, setName] = useState<string>("");
 
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const name = await getUser();
+        setName(name);
+      } catch (error) {}
+    }
+    fetchUser();
+  }, []);
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.push("/Profile")}>
+          <Image
+            style={styles.image}
+            source={require("../assets/images/avatar.jpeg")}
+          />
+        </TouchableOpacity>
         <Text style={styles.title}>
           Welcome back{" "}
-          <Text style={{ fontWeight: "800", color: "white" }}>Himanshu</Text>
+          <Text style={{ fontWeight: "800", color: "white" }}>
+            {name || "User"}
+          </Text>
         </Text>
       </View>
-      <View style={styles.notification}>
+      <TouchableOpacity
+        onPress={() => router.push("/Notification")}
+        style={styles.notification}
+      >
         <Icon name="notifications-outline" style={styles.notificationIcon} />
-      </View>
-    </SafeAreaView>
+      </TouchableOpacity>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "black",
+    paddingHorizontal: 12,
     padding: 12,
-    paddingHorizontal: 24,
     display: "flex",
     flexDirection: "row",
     alignItems: "center",

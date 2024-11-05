@@ -4,22 +4,36 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Button from "@/components/Button";
 import BottomSheetPopover from "@/components/BottomSheet";
 import CheckYourEmail from "@/components/CheckYourEmail";
-
+import AuthService from "@/service/auth.service";
+import { ID } from "react-native-appwrite";
+import { account } from "@/service/config.service";
+const authService = new AuthService();
 export default function Login() {
   const [formState, setFormState] = useState<{ email: string; error: string }>({
     email: "",
     error: "",
   });
+  const [userId, setUserIdEmailLogin] = useState<string>("");
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const handleContinue = () => {
-    if (!validate(formState.email)) return;
+  const handleContinue = async () => {
+    try {
+      if (!validate(formState.email)) return;
 
-    setModalVisible(!isModalVisible);
-    if (!isModalVisible) {
-      // Call handleLogin only when modal is about to open
-      handleLogin();
-    } else {
+      setModalVisible(!isModalVisible);
+      if (!isModalVisible) {
+        // Call handleLogin only when modal is about to open
+        handleLogin();
+        const userId = await authService.createEmailLoginService(
+          ID.unique(),
+          formState.email
+        );
+        if (userId) setUserIdEmailLogin(userId);
+      } else {
+        handleClose();
+      }
+    } catch (error) {
+      console.log(error);
       handleClose();
     }
   };
@@ -41,17 +55,16 @@ export default function Login() {
 
   function handleLogin() {
     if (!validate(formState.email)) return;
-    console.log("Yayyy you logged in");
     // Show bottom sheet on successful login
     setModalVisible(true); // This opens the modal
   }
 
   const handleOpen = () => {
-    console.log("Bottom sheet opened");
+    // console.log("Bottom sheet opened");
   };
 
   const handleClose = () => {
-    console.log("Bottom sheet closed");
+    // console.log("Bottom sheet closed");
     setModalVisible(false); // Close the modal
   };
 
@@ -96,7 +109,11 @@ export default function Login() {
           onOpen={handleOpen}
           onClose={handleClose}
         >
-          <CheckYourEmail email={formState.email} onClose={handleClose} />
+          <CheckYourEmail
+            userId={userId}
+            email={formState.email}
+            onClose={handleClose}
+          />
         </BottomSheetPopover>
       </View>
     </SafeAreaView>
