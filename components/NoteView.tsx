@@ -1,9 +1,15 @@
 import { NoteCardProps } from "@/types/main.type";
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 import Button from "./Button";
 import { router } from "expo-router";
 import { StyleSheet } from "react-native";
+import { databases } from "@/service/config.service";
+import { ID } from "react-native-appwrite";
+import { useAuthStore } from "@/store/authStore";
+import Toast from "react-native-toast-message";
+import { formatDate } from "@/utils/handleDate";
+import { useNotes } from "@/context/notesContext";
 
 interface NoteViewProps {
   noteItem?: NoteCardProps | null;
@@ -15,6 +21,66 @@ interface NoteViewProps {
 }
 export default function NoteView(props: NoteViewProps) {
   const { noteItem, setNoteItem, randomPlaceholder } = props;
+  const { fetchNotesData } = useNotes();
+  const [newTags, setNewTags] = useState<string>(
+    noteItem?.tags?.map((tag) => `#${tag}`).join(" ") || ""
+  );
+  const { user } = useAuthStore();
+  async function createNote() {
+    try {
+      let tags = newTags
+        .split("#")
+        .map((t) => t.trim())
+        .filter((t) => t !== "");
+      if (noteItem?.$id) {
+        await databases.updateDocument(
+          "672a448300359977d5dc",
+          "672a4494002282b6181f",
+          noteItem.$id!,
+          {
+            title: noteItem?.title,
+            description: noteItem?.description,
+            tags: tags,
+            dateandtime: new Date(),
+            userId: user.$id,
+          }
+        );
+        alert("Updated Note");
+      } else {
+        await databases.createDocument(
+          "672a448300359977d5dc",
+          "672a4494002282b6181f",
+          ID.unique(),
+          {
+            title: noteItem?.title,
+            description: noteItem?.description,
+            tags: tags,
+            dateandtime: new Date(),
+            userId: user.$id,
+          }
+        );
+        alert("Successfully created");
+      }
+      fetchNotesData();
+      // showSuccessToast();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  function showSuccessToast() {
+    Toast.show({
+      type: "success",
+      text1: "Congratulations",
+      text2: "Note Created Successfully!",
+    });
+  }
+
+  const formatDateString = useMemo(() => {
+    return noteItem
+      ? formatDate(noteItem?.$updatedAt! as any)
+      : formatDate(Date.now() as any);
+  }, []);
   return (
     <View style={style.screen}>
       <View style={style.container}>
@@ -36,14 +102,13 @@ export default function NoteView(props: NoteViewProps) {
             alignItems: "center",
           }}
         >
-          <Text style={style.description}>4th Jan 2025 -</Text>
-          {noteItem?.tags?.map((tag, index) => {
-            return (
-              <Text key={index} style={style.description}>
-                #{tag}
-              </Text>
-            );
-          })}
+          <Text style={style.description}>{formatDateString} - </Text>
+          <TextInput
+            onChangeText={(text) => setNewTags(text)}
+            value={newTags || noteItem?.tags?.map((tag) => `#${tag}`).join(" ")}
+            style={style.description}
+            placeholder="#example #work"
+          />
         </View>
         <ScrollView contentContainerStyle={style.scrollContainer}>
           <TextInput
@@ -69,7 +134,9 @@ export default function NoteView(props: NoteViewProps) {
         >
           Cancel
         </Button>
-        <Button style={[style.button, style.buttonMain]}>Continue</Button>
+        <Button style={[style.button, style.buttonMain]} onPress={createNote}>
+          Continue
+        </Button>
       </View>
     </View>
   );

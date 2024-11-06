@@ -1,23 +1,18 @@
 import { getUser } from "@/service/auth.service";
+import { useAuthStore } from "@/store/authStore";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
 
 export default function Header() {
-  const [name, setName] = useState<string>("");
+  const { user } = useAuthStore();
+  const username = useMemo(() => {
+    return user.name;
+  }, [user.name]);
 
-  useEffect(() => {
-    async function fetchUser() {
-      try {
-        const name = await getUser();
-        setName(name);
-      } catch (error) {}
-    }
-    fetchUser();
-  }, []);
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -29,9 +24,7 @@ export default function Header() {
         </TouchableOpacity>
         <Text style={styles.title}>
           Welcome back{" "}
-          <Text style={{ fontWeight: "800", color: "white" }}>
-            {name || "User"}
-          </Text>
+          <Text style={{ fontWeight: "800", color: "white" }}>{username}</Text>
         </Text>
       </View>
       <TouchableOpacity

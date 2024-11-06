@@ -13,6 +13,7 @@ import "../global.css";
 import React from "react";
 import { Stack } from "expo-router";
 import { account } from "@/service/config.service";
+import Toast from "react-native-toast-message";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -52,6 +53,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      <Toast />
       <Stack
         screenOptions={{
           headerShown: false,

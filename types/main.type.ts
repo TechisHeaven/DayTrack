@@ -1,9 +1,11 @@
 export interface NoteCardProps {
+  $id?: string;
   id: string | number;
   title: string;
   description: string;
   dateandtime: string;
   tags?: string[]; //
+  $updatedAt?: string[]; //
 }
 export interface TodoRouteParams {
   item: NoteCardProps;

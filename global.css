@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url("https://fonts.googleapis.com/css2?family=Anton&display=swap");
 
 #root {
   --main-background-color: #2b2a2b;
@@ -10,10 +11,17 @@
   --main-black-color: #000101;
 }
 
+* {
+  font-family: "Anton", serif;
+  font-style: normal;
+}
+
 body {
   background: linear-gradient(
     -45deg,
     var(--main-background-color),
     var(--main-black-color)
   );
+  font-family: "Anton", serif;
+  font-style: normal;
 }

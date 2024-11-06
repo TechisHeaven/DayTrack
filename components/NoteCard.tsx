@@ -1,4 +1,5 @@
 import { NoteCardProps } from "@/types/main.type";
+import { formatDate } from "@/utils/handleDate";
 import React from "react";
 import { Text, View } from "react-native";
 
@@ -27,7 +28,7 @@ export default function NoteCard(props: NotePrps) {
     >
       <Text style={{ fontSize: 20, fontWeight: "600" }}>{title}</Text>
       <Text style={{ fontSize: 14, color: "gray", fontWeight: "600" }}>
-        {dateandtime}
+        {formatDate(dateandtime)}
       </Text>
       <Text
         style={{

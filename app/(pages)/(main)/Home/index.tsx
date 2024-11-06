@@ -1,9 +1,8 @@
 import Button from "@/components/Button";
 import NoteCard from "@/components/NoteCard";
 import TabList from "@/components/TabList";
-import { notes } from "@/constants/Notes";
 import { NoteCardProps } from "@/types/main.type";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity } from "react-native";
 import { Text, View } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
@@ -13,18 +12,20 @@ import { router } from "expo-router";
 import { FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Header from "@/components/Header";
-import EmojiPicker from "@/components/Dialog";
 import { useAuthStore } from "@/store/authStore";
-import { account } from "@/service/config.service";
 import DialogModal from "@/components/Dialog";
 import NameUpdateForm from "@/components/UpdateName";
+import { useNotes } from "@/context/notesContext";
+import Loading from "@/components/Loading";
 
 export default function Home() {
-  const [selectedTab, setSelectedTab] = useState<string | null>(null);
+  const [selectedTab, setSelectedTab] = useState<string>("all");
   const [isGrid, setIsGrid] = useState<boolean>(true);
   const [isVisible, setIsVisible] = useState<boolean>(true);
   const [selectedLayout, setSelectedLayout] = useState<"grid" | "list">("grid");
   const { user } = useAuthStore();
+  const { notes, loading } = useNotes();
+
   useEffect(() => {
     if (!user.name) {
       setIsVisible(true);
@@ -43,10 +44,18 @@ export default function Home() {
     "all",
     "personal",
     "work",
-    "fitness",
-    "skills",
-    "normal expenses",
+    ...Array.from(new Set(notes.flatMap((note) => note?.tags || []))),
   ];
+
+  console.log(tabs);
+  // const tabs = [
+  //   "all",
+  //   "personal",
+  //   "work",
+  //   "fitness",
+  //   "skills",
+  //   "normal expenses",
+  // ];
 
   const handleTabSelect = (tab: string) => {
     setSelectedTab(tab); // Update selected tab in the parent component
@@ -69,27 +78,30 @@ export default function Home() {
 
   const columnCount = getColumnCount();
 
-  const filteredNotes = notes.filter((note) =>
-    selectedTab === "all"
-      ? true
-      : selectedTab
-      ? note.tags?.includes(selectedTab)
-      : note.tags?.length === 0
-  );
+  const filteredNotes = useMemo(() => {
+    return notes.filter((note) =>
+      selectedTab === "all"
+        ? true
+        : selectedTab
+        ? note.tags?.includes(selectedTab)
+        : note.tags?.length === 0
+    );
+  }, [notes]);
+
   // Render item function
   const renderItem = ({ item }: { item: NoteCardProps }) => (
     <TouchableOpacity
       onPress={() =>
         router.navigate({
           pathname: "/(main)/Note/[id]",
-          params: { id: item.id },
+          params: { id: item.$id! },
         })
       }
-      key={item.id}
+      key={item.$id}
       style={[styles.noteContainer, !isGrid && styles.noteContainerList]}
     >
       <NoteCard
-        id={item.id}
+        id={item.$id!}
         title={item.title}
         dateandtime={item.dateandtime}
         description={item.description}
@@ -97,6 +109,10 @@ export default function Home() {
       />
     </TouchableOpacity>
   );
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -149,14 +165,15 @@ export default function Home() {
       <View style={{ paddingVertical: 20 }}>
         <TabList tabs={tabs} onTabSelect={handleTabSelect} />
       </View>
+
       <FlatList
         data={filteredNotes}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id as string}
+        keyExtractor={(item) => item.$id as string}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContainer}
         numColumns={columnCount}
-        key={isGrid ? "grid" : "row"}
+        key={!isGrid ? "row" : "grid"}
       />
       <DialogModal isVisible={isVisible} onClose={handleCloseModal}>
         <NameUpdateForm onUpdateSuccess={handleUpateSession} />
@@ -237,6 +254,7 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 10, // Adds spacing between items
     maxWidth: "48%", // Adjusts the width to fit two items per row
+    backgroundColor: "black",
   },
   noteContainerList: {
     maxWidth: "100%", // Adjusts the width to fit two items per row
